@@ -4,6 +4,14 @@
 
     Copyright (c)2015 Charles Boyd (charlesboyd.me). All rights reserved.
     
+    Sample Usage:
+    
+        <script src="mpRefresh.js"></script>
+        <script>
+            mpRefresh.setRefreshInterval(10);
+            mpRefresh.start();
+        </script>
+ 
 */
 
 var mpRefresh = function(){
