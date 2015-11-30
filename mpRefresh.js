@@ -98,14 +98,9 @@ var mpRefresh = function(){
             p.innerHTML = "<span class='title'>You are offline. &nbsp;&nbsp; <a href='#' onclick='mpRefresh.start();' style='color:#000'>Refresh Now</a>";
             p.style.cssText = "color: #000; font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 16px; text-align: center; font-weight: bold; padding: 0;margin: 0;";
 
-
             errorDiv.appendChild(p);
             document.body.insertBefore(errorDiv, document.body.firstChild);
-
-            link.href = '//cdn01.its.msstate.edu/i/emergency/1.4/hazard.css';
-            link.media = 'screen';
-            link.rel = 'stylesheet';
-            document.body.appendChild(link);
+            
         }else{
             errorDiv.style.display = "block";
         }
