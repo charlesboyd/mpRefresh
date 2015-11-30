@@ -8,9 +8,7 @@
 
 var mpRefresh = function(){
 
-    var refreshIntervalS = 30;
-
-    console.log("Hello World");
+    var refreshIntervalS = 20;
 
     var requestPage = function(){
         var xhttp;
@@ -36,16 +34,54 @@ var mpRefresh = function(){
         xhttp.send();
     };
     
+    
     var responseRecieved = function(newHTML){
         console.log(newHTML);
-    }
+        
+        var newBody = getStringBetween(newHTML, "<body>", "</body>").trim();
+        var oldBody = document.getElementsByTagName('body')[0].innerHTML.trim();
+        
+        if(newBody==oldBody){
+            console.log("Same");
+        }else{
+            console.log("Different");
+            console.log(newBody);
+            console.log(oldBody);
+        }
+        
+    };
+    
+    var getStringBetween = function(haystack, first, last){
+        if(typeof last == "undefined"){ last = first; }
+        return haystack.substring(haystack.lastIndexOf(first)+first.length,haystack.lastIndexOf(last));
+    };
     
     var requestError = function(){
         console.log("Request Error!");
-    }
+    };
+    
+    var currentBody = {
+        get:
+            function(){
+                return document.getElementsByTagName('body')[0].innerHTML;
+             },
+        set:
+            function(newBody){
+                document.getElementsByTagName('body')[0].innerHTML = newBody;
+            }
+    };
     
     
-    
+    var timer = setInterval(requestPage, refreshIntervalS*1000);
+
     requestPage();
+    
+    var stop = function(){
+        clearInterval(timer);
+    };
+    
+    return {
+        stop:stop
+    };
 
 }();
