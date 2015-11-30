@@ -8,8 +8,10 @@
 
 var mpRefresh = function(){
 
-    var refreshIntervalS = 20; //In Seconds (default)
+    var refreshIntervalS = 10; //In Seconds (default)
     var timer = "init";
+    
+    var previousPage = null;
 
     var requestPage = function(){
         var xhttp;
@@ -29,7 +31,6 @@ var mpRefresh = function(){
         };
         
         var pageURL = window.location.href;
-        console.log(pageURL);
         
         xhttp.open("GET", pageURL, true);
         xhttp.send();
@@ -37,18 +38,27 @@ var mpRefresh = function(){
     
     
     var responseRecieved = function(newHTML){
-        console.log(newHTML);
+        if(typeof newHTML != "string" || newHTML.length<10){
+            requestError();
+            return;
+        }
+    
+        if(previousPage==null){
+            previousPage = newHTML;
+            return;
+        }
         
         var newBody = getStringBetween(newHTML, "<body>", "</body>").trim();
-        var oldBody = document.getElementsByTagName('body')[0].innerHTML.trim();
+        var oldBody = getStringBetween(previousPage, "<body>", "</body>").trim();
         
         if(newBody==oldBody){
-            console.log("Same");
+            console.log("Same; No Updates.");
         }else{
-            console.log("Different");
-            console.log(newBody);
-            console.log(oldBody);
+            console.log("Updated: "+newBody.length+" vs "+oldBody.length);
+            document.getElementsByTagName('body')[0].innerHTML = newBody;
         }
+        
+        previousPage = newHTML;
         
     };
     
@@ -58,7 +68,8 @@ var mpRefresh = function(){
     };
     
     var requestError = function(){
-        console.log("Request Error!");
+        console.log("Request Error! Stopping...");
+        stop();
     };
     
     var currentBody = {
