@@ -8,7 +8,8 @@
 
 var mpRefresh = function(){
 
-    var refreshIntervalS = 20;
+    var refreshIntervalS = 20; //In Seconds (default)
+    var timer = "init";
 
     var requestPage = function(){
         var xhttp;
@@ -72,16 +73,31 @@ var mpRefresh = function(){
     };
     
     
-    var timer = setInterval(requestPage, refreshIntervalS*1000);
-
-    requestPage();
-    
-    var stop = function(){
-        clearInterval(timer);
+    var start = function(){
+        timer = setInterval(requestPage, refreshIntervalS*1000);
     };
     
+    var stop = function(){
+        if(typeof timer!="string"){
+            clearInterval(timer);
+        }
+        timer = "stopped";
+    };
+    
+    var setRefreshInterval = function(newInterval){
+        refreshIntervalS = newInterval;
+        stop();
+        start();
+    };
+    
+    requestPage(); //TEMP
+    start();
+    
+    //Public Functions
     return {
-        stop:stop
+        stop:stop,
+        start:start,
+        setRefreshInterval:setRefreshInterval
     };
 
 }();
