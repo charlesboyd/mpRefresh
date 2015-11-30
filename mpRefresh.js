@@ -8,12 +8,16 @@
 
 var mpRefresh = function(){
 
-    var refreshIntervalS = 10; //In Seconds (default)
-    var timer = "init";
-    
+    var refreshIntervalS = 20; //In Seconds (default)
+    var timer = null;
+    var status = "init"
+    var log = true;
     var previousPage = null;
 
     var requestPage = function(){
+        console.log("requesting");
+        return;
+    
         var xhttp;
         if (window.XMLHttpRequest) {
             xhttp = new XMLHttpRequest();
@@ -52,9 +56,9 @@ var mpRefresh = function(){
         var oldBody = getStringBetween(previousPage, "<body>", "</body>").trim();
         
         if(newBody==oldBody){
-            console.log("Same; No Updates.");
+            if(log){ console.log("No Updates"); }
         }else{
-            console.log("Updated: "+newBody.length+" vs "+oldBody.length);
+            if(log){ console.log("Updated. FYI New Body Length: "+newBody.length+", Old Body Length: "+oldBody.length); }
             document.getElementsByTagName('body')[0].innerHTML = newBody;
         }
         
@@ -85,30 +89,81 @@ var mpRefresh = function(){
     
     
     var start = function(){
+        requestPage(); //Inital Request
+        
+        window.addEventListener('focus', windowRefocus);
+        window.addEventListener('blur', windowBlur);
+        
+        status="paused";
+        restart();
+    };
+    
+    var restart = function(){
+        if(status!="paused"){
+            throw new Error("Need to pause or call start() first");
+        }
         timer = setInterval(requestPage, refreshIntervalS*1000);
+        status="running";
+    };
+    
+    var pause = function(){
+        if(status=="running"){
+            clearInterval(timer);
+        }
+        timer = null;
+        status="paused";
     };
     
     var stop = function(){
-        if(typeof timer!="string"){
-            clearInterval(timer);
-        }
-        timer = "stopped";
+        pause();
+        previousPage=null;
+        
+        window.removeEventListener('focus', windowRefocus);
+        window.removeEventListener('blur', windowBlur);
+        
+        status="stopped";
     };
+    
+    var windowRefocus = function(){
+        if(status=="tabhidden"){
+            status="paused";
+            restart();
+        }
+    }
+    
+    var windowBlur = function(){
+        if(status=="running"){
+            pause();
+            status="tabhidden";
+        }
+    }
     
     var setRefreshInterval = function(newInterval){
         refreshIntervalS = newInterval;
-        stop();
-        start();
+        if(status=="running"){
+            pause();
+            restart();
+        }
     };
     
-    requestPage(); //TEMP
-    start();
+    var setLogging = function(logOnOff){
+        log = logOnOff;
+    }
+    
+    var getStatus = function(){
+        return status;
+    }
+    
     
     //Public Functions
     return {
-        stop:stop,
         start:start,
-        setRefreshInterval:setRefreshInterval
+        stop:stop,
+        restart:restart,
+        pause:pause,
+        setRefreshInterval:setRefreshInterval,
+        setLogging:setLogging,
+        getStatus:getStatus
     };
 
 }();
