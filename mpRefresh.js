@@ -13,10 +13,9 @@ var mpRefresh = function(){
     var status = "init"
     var log = true;
     var previousPage = null;
+    var errorDiv = null;
 
     var requestPage = function(){
-        console.log("requesting");
-        return;
     
         var xhttp;
         if (window.XMLHttpRequest) {
@@ -45,6 +44,10 @@ var mpRefresh = function(){
         if(typeof newHTML != "string" || newHTML.length<10){
             requestError();
             return;
+        }else{
+            if(errorDiv!=null){
+                errorDiv.style.display="none";
+            }
         }
     
         if(previousPage==null){
@@ -72,21 +75,34 @@ var mpRefresh = function(){
     };
     
     var requestError = function(){
-        console.log("Request Error! Stopping...");
+        if(log){ console.log("Request Error! Pausing..."); }
+        
         stop();
+        
+        if(errorDiv==null){
+            errorDiv = document.createElement('div');
+            var p = document.createElement('p');
+            var link = document.createElement('link');
+
+            errorDiv.id = 'mprefresherrormessage';
+            errorDiv.style.cssText ="display:block; width: 100%; padding: 10px 0; margin: 0; background-color: #FFD712;";
+
+            p.innerHTML = "<span class='title'>You are offline. &nbsp;&nbsp; <a href='#' onclick='mpRefresh.start();' style='color:#000'>Refresh Now</a>";
+            p.style.cssText = "color: #000; font-family: 'HelveticaNeue-Light', 'Helvetica Neue Light', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif; font-size: 16px; text-align: center; font-weight: bold; padding: 0;margin: 0;";
+
+
+            errorDiv.appendChild(p);
+            document.body.insertBefore(errorDiv, document.body.firstChild);
+
+            link.href = '//cdn01.its.msstate.edu/i/emergency/1.4/hazard.css';
+            link.media = 'screen';
+            link.rel = 'stylesheet';
+            document.body.appendChild(link);
+        }else{
+            errorDiv.style.display = "block";
+        }
+
     };
-    
-    var currentBody = {
-        get:
-            function(){
-                return document.getElementsByTagName('body')[0].innerHTML;
-             },
-        set:
-            function(newBody){
-                document.getElementsByTagName('body')[0].innerHTML = newBody;
-            }
-    };
-    
     
     var start = function(){
         requestPage(); //Inital Request
@@ -102,6 +118,7 @@ var mpRefresh = function(){
         if(status!="paused"){
             throw new Error("Need to pause or call start() first");
         }
+        requestPage();
         timer = setInterval(requestPage, refreshIntervalS*1000);
         status="running";
     };
