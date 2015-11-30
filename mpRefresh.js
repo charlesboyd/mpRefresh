@@ -8,10 +8,10 @@
 
 var mpRefresh = function(){
 
-    var refreshIntervalS = 20; //In Seconds (default)
+    var refreshIntervalS = 20; //Default interval in Seconds
     var timer = null;
     var status = "init"
-    var log = true;
+    var log = false;
     var previousPage = null;
     var errorDiv = null;
 
