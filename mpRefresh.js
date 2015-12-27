@@ -18,11 +18,11 @@
  
 */
 
-var mpRefresh = function(){
+var mpRefresh = (function(){
 
     var refreshIntervalS = 20; //Default interval in Seconds
     var timer = null;
-    var status = "init"
+    var status = "init";
     var log = false;
     var previousPage = null;
     var errorDiv = null;
@@ -153,14 +153,14 @@ var mpRefresh = function(){
             status="paused";
             restart();
         }
-    }
+    };
     
     var windowBlur = function(){
         if(status=="running"){
             pause();
             status="tabhidden";
         }
-    }
+    };
     
     var setRefreshInterval = function(newInterval){
         refreshIntervalS = newInterval;
@@ -172,11 +172,11 @@ var mpRefresh = function(){
     
     var setLogging = function(logOnOff){
         log = logOnOff;
-    }
+    };
     
     var getStatus = function(){
         return status;
-    }
+    };
     
     
     //Public Functions
@@ -190,4 +190,4 @@ var mpRefresh = function(){
         getStatus:getStatus
     };
 
-}();
+}());
