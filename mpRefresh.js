@@ -2,7 +2,7 @@
 
     mpRefresh.js
 
-    Copyright ©2015 Charles Boyd <http://charlesboyd.me>
+    Copyright (c)2015 Charles Boyd <http://charlesboyd.me>
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. View the `license.txt` file or visit <http://www.apache.org/licenses/LICENSE-2.0> to obtain a copy of the License.
    
@@ -26,6 +26,7 @@ var mpRefresh = (function(){
     var log = false;
     var previousPage = null;
     var errorDiv = null;
+    var pauseOnHide = false;    //Set to true to temporarily stop refeshing when the user is no longer focused on the page.
 
     var requestPage = function(){
     
@@ -67,8 +68,20 @@ var mpRefresh = (function(){
             return;
         }
         
-        var newBody = getStringBetween(newHTML, "<body>", "</body>").trim();
-        var oldBody = getStringBetween(previousPage, "<body>", "</body>").trim();
+        var extractBody = function(fullPageString){
+            var body = getStringBetween(fullPageString, "<body", "</body>");
+            var closeBracketIndex = body.indexOf(">");
+            if(closeBracketIndex==-1){
+                requestError();
+                return;
+            }
+            body = body.substring(closeBracketIndex+1);
+            body = body.trim();
+            return body;
+        }
+        
+        var newBody = extractBody(newHTML);
+        var oldBody = extractBody(previousPage);
         
         if(newBody==oldBody){
             if(log){ console.log("No Updates"); }
@@ -156,7 +169,7 @@ var mpRefresh = (function(){
     };
     
     var windowBlur = function(){
-        if(status=="running"){
+        if(status=="running" && pauseOnHide==true){
             pause();
             status="tabhidden";
         }
@@ -177,6 +190,10 @@ var mpRefresh = (function(){
     var getStatus = function(){
         return status;
     };
+    
+    var setPauseOnHide = function(yesno){
+        pauseOnHide = yesno;
+    }
     
     
     //Public Functions
